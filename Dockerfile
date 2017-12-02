@@ -21,11 +21,6 @@ RUN apk add --no-cache ca-certificates openssl && \
     unzip -d / docker-base.zip && \
     rm docker-base.zip
 
-ENV PORT 22
-ENV RECONNECT_OPTIONS reconnect,ServerAliveInterval=15,ServerAliveCountMax=20480
-ENV Mount_TYPE
-ENV MOUNT_OPTIONS allow_other,StrictHostKeyChecking=no
-
 RUN apk update && \
     apk add autofs && \
     apk add sshfs && \
