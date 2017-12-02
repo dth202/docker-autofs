@@ -1,6 +1,6 @@
 FROM centos:centos7
-MAINTAINER Dallas Harris
-
+ENV container docker
+MAINTAINER: Justin Parisi "whyistheinternetbroken@gmail.com"
 RUN yum -y update; yum clean all
 RUN yum -y swap -- remove fakesystemd -- install systemd systemd-libs
 RUN yum -y install nfs-utils; yum clean all
@@ -18,24 +18,18 @@ VOLUME ["/run"]
 
 CMD  ["/usr/lib/systemd/systemd"]
 
-RUN yum update && \
-    yum install autofs && \
-    yum install sshfs && \
-    yum install nfs-common && \
-    yum install cifs-utils && \
-    yum clean all && \
-    rm -rf  /sbin/halt \
-            /sbin/poweroff \
-            /sbin/reboot
+# Make mount point
+RUN mkdir /docker-nfs
 
-# Add autofs mount configs and mount direcotry
-RUN echo "/mounts /config/auto.mounts --timeout=20 --ghost" >> /etc/auto.master && \
-    mkdir /config /mounts && \
-    chattr +i /mounts
-COPY auto.mymounts /config/auto.mymounts
-COPY auto.master /etc/auto.master.d/auto.mount
-VOLUME ["/config"]
-VOLUME ["/mounts"]
+# Configure autofs
+RUN yum install -y autofs
+RUN echo "/docker-nfs /etc/auto.misc --timeout=50" >> /etc/auto.master
 
-#ENTRYPOINT ["/usr/local/bin/entry.sh"]
-CMD ["/bin/sh"]
+###### CONFIGURE THIS PORTION TO YOUR OWN SPECS ######
+#RUN echo "docker -fstype=nfs4,minorversion=1,rw,nosuid,hard,tcp,timeo=60 10.228.225.142:/docker" >> /etc/auto.misc
+######################################################
+
+
+# Copy the shell script to finish setup
+COPY configure-nfs.sh /configure-nfs.sh
+RUN chmod 777 configure-nfs.sh
