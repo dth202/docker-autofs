@@ -18,11 +18,11 @@ VOLUME ["/run"]
 
 CMD  ["/usr/lib/systemd/systemd"]
 
-RUN yum update && \
-    yum install autofs && \
-    yum install sshfs && \
-    yum install nfs-common && \
-    yum install cifs-utils && \
+RUN yum -y update && \
+    yum install -y autofs && \
+    yum install -y fuse-sshfs && \
+    yum install -y nfs-utils && \
+    yum install -y cifs-utils && \
     yum clean all && \
     rm -rf  /sbin/halt \
             /sbin/poweroff \
